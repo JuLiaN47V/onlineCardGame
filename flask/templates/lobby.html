@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/socket.io/1.3.6/socket.io.min.js"></script>
+    <script src="{{ url_for('static', filename='js/lobby.js') }}"></script>
+    <meta charset="UTF-8">
+    <title>Lobby</title>
+</head>
+<body>
+<p>Players: </p>
+<textarea id="playerAmountArea">{{playerAmount}}</textarea>
+
+</body>
+</html>
