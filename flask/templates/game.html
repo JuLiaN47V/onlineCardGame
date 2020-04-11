@@ -2,19 +2,13 @@
 <html lang="en">
 <head>
     <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/socket.io/1.3.6/socket.io.min.js"></script>
-    <script src="{{ url_for('static', filename='js/game.js') }}"></script>
-    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/game.css') }}">
+    <script src="{{ url_for('static', filename='js/game.js') }}" defer></script>
     <meta charset="UTF-8">
     <title>Game</title>
 </head>
 <body>
-
-<script>
-
-    //TODO
-    createCircleOfDivs(2, 100, 100, 100, 'dynamic')
-
-</script>
-
+ {% for player in players %}
+    <p id="player{{ loop.index }}">Player</p>
+ {% endfor %}
 </body>
 </html>

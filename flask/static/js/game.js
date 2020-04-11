@@ -1,12 +1,16 @@
-function createCircleOfDivs(list, radius, offsetX, offsetY, className) {
-   var x, y;
-   for (var n = 0; n < list.length; n++) {
-     x = radius * Math.cos(n / num * 2 * Math.PI);
-     y = radius * Math.sin(n / num * 2 * Math.PI);
-     var div = document.createElement("textarea");
-     div.className = className;
-     div.style.left = (x + offsetX) + "px";
-     div.style.top = (y + offsetY) + "px";
-     document.body.appendChild(div);
-   }
-}
+ var cookieArr = document.cookie.split(";");
+let username
+    // Loop through the array elements
+    for(var i = 0; i < cookieArr.length; i++) {
+        var cookiePair = cookieArr[i].split("=");
+        if (cookiePair[0] === "username"){
+            username = cookiePair[1]
+        }
+    }
+
+
+
+var socket = io.connect('http://' + document.domain + ':' + location.port);
+socket.on('connect', function () {
+    socket.emit('hello_game', username)
+  });
