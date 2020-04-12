@@ -8,20 +8,19 @@ app.config['SECRET_KEY'] = 'secret!'
 app.config['SESSION_COOKIE_HTTPONLY'] = False
 socketio = SocketIO(app, manage_session=True)
 
-players = []
-playersGame = []
-playersSave = []
-playersReady = 0
+players = []        #playerlist for lobby
+playersGame = []    # playerlist for game
+playersReady = 0    # amount of players that are ready to play
 
 
 class Game:
-    players = None
-    setCards = None
-    cardsLeft = None
+    players = None      # list of players
+    setCards = None     # cards on table
+    cardsLeft = None    # cards that needs to be given to the players
 
     def __init__(self):
-        self.players = playersSave
-        self.cardsLeft = [
+        self.players = playersGame                  # list of players
+        self.cardsLeft = [                          #cards that needs to be given to the players at start
                           "2E", "2B", "2H", "2S",
                           "3E", "3B", "3H", "3S",
                           "4E", "4B", "4H", "4S",
@@ -39,78 +38,71 @@ class Game:
 
 
 class Player:
-    sid = None
-    name = None
-    state = None
-    cards = []
+    sid = None          #socket sid
+    name = None         # username
+    state = None        # state
+    cards = []          # cards on hand
 
     def __init__(self, name, sid):
         self.sid = sid
         self.name = name
         self.state = "lobby"
 
-    def getState(self):
-        return self.state
 
-
-@socketio.on('redirect')
+@socketio.on('redirect')    # event to handle redirect from index to lobby in index.js
 def redirect():
-    emit('redirect', {'url': url_for('lobby')})
+    emit('redirect', {'url': url_for('lobby')})  # send url to redirect to
 
 
-@socketio.on('new_player')
+@socketio.on('new_player')  # event that handles new player in lobby.js
 def new_player():
     global players
-    players.append(Player(session["username"], request.sid))
-    if len(players) == 1:
-        emit('host', room=players[0].sid)
-    emit('update_player_amount', {'amountP': len(players)}, broadcast=True)
+    players.append(Player(session["username"], request.sid))    # construct new player object
+    if len(players) == 1:       # if this is only player
+        emit('host', room=players[0].sid)   # event to set to lobbyhost
+    emit('update_player_amount', {'amountP': len(players)}, broadcast=True) # event to update playeramount
 
 
-@socketio.on('disconnect')
+@socketio.on('disconnect')  # event that handles every disconnection of every client
 def disconnect():
     global players
     for player in players:
-        if player.sid == request.sid:
-            if players[0].sid == player.sid:
-                players.remove(player)
+        if player.sid == request.sid:    # finds player with sid of event
+            if players[0].sid == player.sid: #
+                players.remove(player)  # removes player
                 try:
-                    emit('host', room=players[0].sid)
+                    emit('host', room=players[0].sid)   # tries to set host to first player
                 except IndexError:
                     pass
             else:
                 players.remove(player)
-            del player
+            del player  # destruct objekt
             break
     emit('update_player_amount', {'amountP': len(players)}, broadcast=True)
 
 
 @socketio.on('start')
-def start():
-    global playersSave
-    playersSave = players.copy()
-    emit("redirect", {'url': url_for('game')}, broadcast=True)
+def start():    # event is sent after host started the game in lobby.js
+    global playersGame
+    playersGame = players.copy()    # copies current playerlist cause players get remove on disconnect event (redirect in next step = new Socket connection)
+    emit("redirect", {'url': url_for('game')}, broadcast=True) # redirects
 
 
 @app.route('/game')
 def game():
-    return render_template('game.html', players=playersSave)    #render template with list of players that were in the lobby to start the game
+    return render_template('game.html', players=playersGame)    #render template with list of players that were in the lobby to start the game
 
 
 @socketio.on('hello_game')      #event is sent after connection in game.js
 def hello_game(username):
     global playersGame
-    global playersSave
     global playersReady
-    playersGame = playersSave.copy()
-    for player in playersGame:
-        print("player")
-        if player.name == username:
-            player.sid = request.sid
-            player.state = "game_ready"
-            playersReady += 1
-    print(playersReady)
-    if playersReady == len(playersGame):
+    for player in playersGame:      #for each player
+        if player.name == username:     #find objekt of session were the event is emitted from
+            player.sid = request.sid    #set sid to new sid
+            player.state = "game_ready" #set state to ready
+            playersReady += 1           #count up the amount of players that are ready
+    if playersReady == len(playersGame):   # if all players are ready
         startGame()
 
 
@@ -167,6 +159,7 @@ def giveCardsEachPlayer():
             player.cards.append(card)       # give player card
             game.cardsLeft.remove(card)     # remove card from the cards that are left
             i += 1
+        print(player.cards)
 
 
 if __name__ == '__main__':
