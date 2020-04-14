@@ -4,3 +4,9 @@
   background: red;
   position: absolute;
 }
+
+.image {
+  position: absolute;
+  width: 100px;
+  height: 170px;
+}

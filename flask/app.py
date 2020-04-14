@@ -1,5 +1,4 @@
-import json
-
+import threading
 from flask import Flask, session, make_response
 from flask import render_template, redirect, url_for, request
 from flask_socketio import SocketIO, join_room, leave_room, emit
@@ -13,7 +12,7 @@ socketio = SocketIO(app, manage_session=True)
 players = []        #playerlist for lobby
 playersGame = []    # playerlist for game
 playersReady = 0    # amount of players that are ready to play
-
+nextPlayerEvent = threading.Event()
 
 class Game:
     players = None      # list of players
@@ -23,19 +22,19 @@ class Game:
     def __init__(self):
         self.players = playersGame                  # list of players
         self.cardsLeft = [                          #cards that needs to be given to the players at start
-                          "2E", "2B", "2H", "2S",
-                          "3E", "3B", "3H", "3S",
-                          "4E", "4B", "4H", "4S",
-                          "5E", "5B", "5H", "5S",
-                          "6E", "6B", "6H", "6S",
-                          "7E", "7B", "7H", "7S",
-                          "8E", "8B", "8H", "8S",
-                          "9E", "9B", "9H", "9S",
-                          "10E", "10B", "10H", "10S",
-                          "UE", "UB", "UH", "US",
-                          "OE", "OB", "OH", "OS",
-                          "KE", "KB", "KH", "KS",
-                          "AE", "AB", "AH", "AS"
+                          "2T", "2P", "2H", "2K",
+                          "3T", "3P", "3H", "3K",
+                          "4T", "4P", "4H", "4K",
+                          "5T", "5P", "5H", "5K",
+                          "6T", "6P", "6H", "6K",
+                          "7T", "7P", "7H", "7K",
+                          "8T", "8P", "8H", "8K",
+                          "9T", "9P", "9H", "9K",
+                          "10T", "10P", "10H", "10K",
+                          "BT", "BP", "BH", "BK",
+                          "DT", "DP", "DH", "DK",
+                          "KT", "KP", "KH", "KK",
+                          "AT", "AP", "AH", "AK"
                           ]
 
 
@@ -143,7 +142,9 @@ def home():
 
 
 def startGame():             # The entire game
-    giveCardsEachPlayer()    # give players the cards once
+    giveCardsEachPlayer()  # give players the cards once
+    for player in playersGame:
+        socketio.emit("yourTurn", room=player.sid)
 
 
 def giveCardsEachPlayer():
@@ -161,7 +162,12 @@ def giveCardsEachPlayer():
             player.cards.append(card)       # give player card
             game.cardsLeft.remove(card)     # remove card from the cards that are left
             i += 1
-        print(player.cards)
+        emit("ownCards", player.cards, room=player.sid)
+
+
+@socketio.on('chooseCard')
+def chooseCard(cardID):
+    print(cardID)
 
 
 if __name__ == '__main__':

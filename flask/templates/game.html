@@ -22,21 +22,37 @@
     offsetX = centerX - radius/2;
     offsetY = centerY - radius/2;
 
+    middleCard = document.createElement("img");
+    middleCardsrc = "static/img/cards/null.png";
+    middleCard.style.left = offsetX - 10 + "px";
+    middleCard.style.top = offsetY - 30 + "px";
+    middleCard.className = "image";
+    document.body.appendChild(middleCard);
 
-    createCircleOfDivs({{ playerAmount|safe}}, radius, offsetX, offsetY, "dynamic");
+    middleCardRight = document.createElement("img");
+    middleCardRight.src = "static/img/cards/null.png";
+    middleCardRight.style.left = offsetX + 110 + "px";
+    middleCardRight.style.top = offsetY - 30 + "px";
+    middleCardRight.className = "image";
+    document.body.appendChild(middleCardRight);
+
+    createCircleOfDivs(8, radius, offsetX, offsetY, "dynamic");
     function createCircleOfDivs(num, radius, offsetX, offsetY, className) {
     var x, y;
     for (var n = 0; n < num; n++) {
-     x = radius * Math.cos(n / num * 2 * Math.PI);
-     y = radius * Math.sin(n / num * 2 * Math.PI);
-     var div = document.createElement("div");
-     div.className = className;
-     div.style.left = (x + offsetX) + "px";
-     div.style.top = (y + offsetY) + "px";
-     div.id = "player" + n;
-     document.body.appendChild(div);
-   }
-}
+         x = radius * Math.cos(n / num * 2 * Math.PI);
+         y = radius * Math.sin(n / num * 2 * Math.PI);
+         var div = document.createElement("div");
+         div.className = className;
+         div.style.left = (x + offsetX) + "px";
+         div.style.top = (y + offsetY) + "px";
+         div.id = "player" + n;
+         document.body.appendChild(div);
+       }
+    }
+
+
+
 </script>
 </body>
 </html>
