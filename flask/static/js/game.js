@@ -1,6 +1,6 @@
 var cookieArr = document.cookie.split(";");
 var myTurn = false;
-let username
+let username;
     // Loop through the array elements
     for(var i = 0; i < cookieArr.length; i++) {
         var cookiePair = cookieArr[i].split("=");
@@ -8,6 +8,23 @@ let username
             username = cookiePair[1]
         }
     }
+
+    leftSelectionCard = document.createElement("img");
+    leftSelectionCard.style.left = 100 + "px";
+    leftSelectionCard.style.top = 65 + "%";
+    leftSelectionCard.className = "image";
+    leftSelectionCard.id = "leftSelectionCard";
+    leftSelectionCard.onclick = detachCard;
+    document.body.appendChild(leftSelectionCard);
+
+    rightSelectionCard = document.createElement("img");
+    rightSelectionCard.style.left = 220 + "px";
+    rightSelectionCard.style.top = 65 + "%";
+    rightSelectionCard.className = "image";
+    rightSelectionCard.id = "rightSelectionCard";
+    rightSelectionCard.onclick = detachCard;
+    document.body.appendChild(rightSelectionCard);
+
 
 var socket = io.connect('http://' + document.domain + ':' + location.port);
 socket.on('connect', function () {
@@ -36,26 +53,38 @@ socket.on("ownCards", function (cards) {
 });
 
 let first = false;
-let firstCard;
-let secondCard;
+let second = false;
+let leftCard;
+let rightCard;
+
 
 function chooseCard() {
 
     if (myTurn === true) {
         if (first === false) {
-            firstCard = this.id;
-        } else {
-            secondCard = this.id;
-            first = false;
+            document.getElementById("leftSelectionCard").src = "static/img/cards/" + this.id + ".png";
+            leftCard = this.id;
+            this.style.visibility = "hidden";
+            first = true;
+        } else if (second === false) {
+            document.getElementById("rightSelectionCard").src = "static/img/cards/" + this.id + ".png";
+            rightCard = this.id;
+            this.style.visibility = "hidden";
+            second = true
         }
-
-
-
-
-
-
     } else {
         alert("Not your turn!")
+    }
+}
+
+function detachCard(){
+    this.src = null;
+    if (this.id === "leftSelectionCard") {
+        document.getElementById(leftCard).style.visibility = 'visible';
+        first = false;
+    } else {
+        document.getElementById(rightCard).style.visibility = 'visible';
+        second = false;
     }
 }
 

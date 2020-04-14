@@ -23,17 +23,17 @@
     offsetY = centerY - radius/2;
 
     middleCard = document.createElement("img");
-    middleCardsrc = "static/img/cards/null.png";
     middleCard.style.left = offsetX - 10 + "px";
     middleCard.style.top = offsetY - 30 + "px";
     middleCard.className = "image";
+    middleCard.id = "leftCardSelected";
     document.body.appendChild(middleCard);
 
     middleCardRight = document.createElement("img");
-    middleCardRight.src = "static/img/cards/null.png";
     middleCardRight.style.left = offsetX + 110 + "px";
     middleCardRight.style.top = offsetY - 30 + "px";
     middleCardRight.className = "image";
+    middleCardRight.id = "rightCardSelected";
     document.body.appendChild(middleCardRight);
 
     createCircleOfDivs(8, radius, offsetX, offsetY, "dynamic");
