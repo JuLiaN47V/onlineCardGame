@@ -1,3 +1,5 @@
+import json
+
 from flask import Flask, session, make_response
 from flask import render_template, redirect, url_for, request
 from flask_socketio import SocketIO, join_room, leave_room, emit
@@ -90,7 +92,7 @@ def start():    # event is sent after host started the game in lobby.js
 
 @app.route('/game')
 def game():
-    return render_template('game.html', players=playersGame)    #render template with list of players that were in the lobby to start the game
+    return render_template('game.html', players=playersGame, playerAmount=len(playersGame)) #render template with list of players that were in the lobby to start the game
 
 
 @socketio.on('hello_game')      #event is sent after connection in game.js
@@ -136,12 +138,12 @@ def home():
         socketio.emit('joinLobbyBTN')                       # event to create button to join gamelobby
         return render_template('index.html', nameText=nameText)
     else:
-        nameText = "Please set a name"                  # if site is entered for the first time
+        nameText = "Please set a name"                  # if site is entered without cookie
         return render_template('index.html', nameText=nameText)
 
 
 def startGame():             # The entire game
-    giveCardsEachPlayer()
+    giveCardsEachPlayer()    # give players the cards once
 
 
 def giveCardsEachPlayer():

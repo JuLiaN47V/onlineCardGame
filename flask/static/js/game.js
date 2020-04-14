@@ -1,4 +1,4 @@
- var cookieArr = document.cookie.split(";");
+var cookieArr = document.cookie.split(";");
 let username
     // Loop through the array elements
     for(var i = 0; i < cookieArr.length; i++) {
@@ -14,3 +14,4 @@ var socket = io.connect('http://' + document.domain + ':' + location.port);
 socket.on('connect', function () {
     socket.emit('hello_game', username)
   });
+

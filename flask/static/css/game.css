@@ -1,6 +1,6 @@
 .dynamic {
-  width: 10px;
-  height: 10px;
+  width: 200px;
+  height: 100px;
   background: red;
   position: absolute;
 }
