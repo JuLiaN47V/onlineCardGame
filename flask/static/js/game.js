@@ -15,14 +15,34 @@ let username;
     leftSelectionCard.className = "image";
     leftSelectionCard.id = "leftSelectionCard";
     leftSelectionCard.onclick = detachCard;
+    leftSelectionCard.src = "static/img/cards/none.png";
     document.body.appendChild(leftSelectionCard);
 
+    leftMiddleSelectionCard = document.createElement("img");
+    leftMiddleSelectionCard.style.left = 210 + "px";
+    leftMiddleSelectionCard.style.top = 65 + "%";
+    leftMiddleSelectionCard.className = "image";
+    leftMiddleSelectionCard.id = "leftMiddleSelectionCard";
+    leftMiddleSelectionCard.onclick = detachCard;
+    leftMiddleSelectionCard.src = "static/img/cards/none.png";
+    document.body.appendChild(leftMiddleSelectionCard);
+
+    rightMiddleSelectionCard = document.createElement("img");
+    rightMiddleSelectionCard.style.left = 320 + "px";
+    rightMiddleSelectionCard.style.top = 65 + "%";
+    rightMiddleSelectionCard.className = "image";
+    rightMiddleSelectionCard.id = "rightMiddleSelectionCard";
+    rightMiddleSelectionCard.onclick = detachCard;
+    rightMiddleSelectionCard.src = "static/img/cards/none.png";
+    document.body.appendChild(rightMiddleSelectionCard);
+
     rightSelectionCard = document.createElement("img");
-    rightSelectionCard.style.left = 220 + "px";
+    rightSelectionCard.style.left = 430 + "px";
     rightSelectionCard.style.top = 65 + "%";
     rightSelectionCard.className = "image";
     rightSelectionCard.id = "rightSelectionCard";
     rightSelectionCard.onclick = detachCard;
+    rightSelectionCard.src = "static/img/cards/none.png";
     document.body.appendChild(rightSelectionCard);
 
 
@@ -55,8 +75,13 @@ socket.on("ownCards", function (cards) {
 
 let first = false;
 let second = false;
-let leftCard;
-let rightCard;
+let third = false;
+let fourth = false;
+let leftCard = "none";
+let leftMiddleCard = "none";
+let rightMiddleCard = "none";
+let rightCard = "none";
+let element;
 
 
 function chooseCard() {
@@ -68,12 +93,22 @@ function chooseCard() {
             this.style.visibility = "hidden";
             first = true;
         } else if (second === false) {
+            document.getElementById("leftMiddleSelectionCard").src = "static/img/cards/" + this.id + ".png";
+            leftMiddleCard = this.id;
+            this.style.visibility = "hidden";
+            second = true
+        } else if (third === false) {
+            document.getElementById("rightMiddleSelectionCard").src = "static/img/cards/" + this.id + ".png";
+            rightMiddleCard = this.id;
+            this.style.visibility = "hidden";
+            third = true
+        } else if (fourth === false) {
             document.getElementById("rightSelectionCard").src = "static/img/cards/" + this.id + ".png";
             rightCard = this.id;
             this.style.visibility = "hidden";
-            second = true
+            fourth = true
         }
-        if (first && second) {
+        if (first || second || third || fourth) {
             let subBtn = document.createElement("button");
             subBtn.onclick = submitCards;
             subBtn.id = "subBtn";
@@ -88,39 +123,79 @@ function chooseCard() {
 }
 
 function detachCard(){
-    this.src = null;
+    this.src = "static/img/cards/none.png";
     if (this.id === "leftSelectionCard") {
         document.getElementById(leftCard).style.visibility = 'visible';
         first = false;
-    } else {
-        document.getElementById(rightCard).style.visibility = 'visible';
+    } else if (this.id === "leftMiddleSelectionCard") {
+        document.getElementById(leftMiddleCard).style.visibility = 'visible';
         second = false;
+    } else if (this.id === "rightMiddleSelectionCard") {
+        document.getElementById(rightMiddleCard).style.visibility = 'visible';
+        third = false;
+    } else if (this.id === "rightSelectionCard") {
+        document.getElementById(rightCard).style.visibility = 'visible';
+        fourth = false;
     }
     document.getElementById("subBtn").remove()
 }
 
 function submitCards(){
-    let valueL;
-    let valueR;
-    if (leftCard.length <= 2){
-        valueL = leftCard.substring(0,1);
-    } else {
-        valueL = leftCard.substring(0,2);
-    }
-
-    if (rightCard.length <= 2){
-        valueR = rightCard.substring(0,1);
-    } else {
-        valueR = rightCard.substring(0,2);
-    }
-
-    if (valueL === valueR){
-  alert("the cards needs to be the same")
-    }
+    socket.emit("chooseCard", leftCard, leftMiddleCard, rightMiddleCard, rightCard);
 }
 
 
 socket.on("yourTurn", function () {
     myTurn = true;
-    setTimeout(function(){ alert("Your turn!"); }, 1500);
+    first = false;
+    second = false;
+    third = false;
+    fourth = false;
+    setTimeout(function () {alert("Your turn!");}, 500);
+});
+
+
+socket.on("update_middle", function (cards) {
+    document.getElementById("middleCardLeft").src = "static/img/cards/" + cards.card1 + ".png";
+    document.getElementById("middleCardMiddleLeft").src = "static/img/cards/" + cards.card2 + ".png";
+    document.getElementById("middleCardMiddleRight").src = "static/img/cards/" + cards.card3 + ".png";
+    document.getElementById("middleCardRight").src = "static/img/cards/" + cards.card4 + ".png";
+});
+
+socket.on("badCards", function () {
+    element = document.getElementById(leftCard);
+    if(typeof(element) != 'undefined' && element != null){
+        first = false;
+        document.getElementById(leftCard).style.visibility = "visible";
+        document.getElementById("leftSelectionCard").src = "static/img/cards/none.png";
+    }
+    element = document.getElementById(leftMiddleCard);
+    if(typeof(element) != 'undefined' && element != null){
+        second = false;
+        document.getElementById(leftMiddleCard).style.visibility = "visible";
+        document.getElementById("leftMiddleSelectionCard").src = "static/img/cards/none.png";
+    }
+    element = document.getElementById(rightMiddleCard);
+    if(typeof(element) != 'undefined' && element != null){
+        third = false;
+        document.getElementById(rightMiddleCard).style.visibility = "visible";
+        document.getElementById("rightMiddleSelectionCard").src = "static/img/cards/none.png";
+    }
+    element = document.getElementById(rightCard);
+    if(typeof(element) != 'undefined' && element != null){
+        fourth = false;
+        document.getElementById(rightCard).style.visibility = "visible";
+        document.getElementById("rightSelectionCard").src = "static/img/cards/none.png";
+    }
+
+
+
+
+
+
+
+
+
+
+    alert("Not working")
 });

@@ -16,9 +16,10 @@ playersReady = 0  # amount of players that are ready to play
 
 
 class Game:
-    players = None  # list of players
-    setCards = None  # cards on table
-    cardsLeft = None  # cards that needs to be given to the players
+    players = []  # list of players
+    setCards = ["none", "none", "none", "none"]  # cards on table
+    cardsLeft = []  # cards that needs to be given to the players
+    rounds = 0
 
     def __init__(self):
         self.players = playersGame  # list of players
@@ -49,6 +50,9 @@ class Player:
         self.sid = sid
         self.name = name
         self.state = "lobby"
+
+
+game = None
 
 
 @socketio.on('redirect')  # event to handle redirect from index to lobby in index.js
@@ -98,7 +102,8 @@ def game():
         testlist.append(player)
 
     print(testlist)
-    return render_template('game.html', players=json.dumps(testlist), playerAmount=len(testlist))  # render template with list of players that were in the lobby to start the game
+    return render_template('game.html', players=json.dumps(testlist), playerAmount=len(
+        testlist))  # render template with list of players that were in the lobby to start the game
 
 
 @socketio.on('hello_game')  # event is sent after connection in game.js
@@ -157,12 +162,12 @@ def home():
 
 def startGame():  # The entire game
     giveCardsEachPlayer()  # give players the cards once
-    for player in playersGame:
-        socketio.emit("yourTurn", room=player.sid)
+    nextPlayer()
 
 
 def giveCardsEachPlayer():
     global playersGame
+    global game
     cardsEachPlayer = 52 / len(playersGame)  # Cards Amount / Amount of Player
     game = Game()
     for player in playersGame:
@@ -185,8 +190,102 @@ def givePlayerCards(player):
 
 
 @socketio.on('chooseCard')
-def chooseCard(cardID):
-    print(cardID)
+def chooseCard(card1, card2, card3, card4):
+    global game
+    actualCardsSet = []
+    for card in game.setCards:
+        if card != "none":
+            actualCardsSet.append(card)
+    index = {"B": 11, "D": "12", "K": 13, "A": 14}
+    cardsAll = [card1, card2, card3, card4]
+    cardsValue = []
+    for card in cardsAll:
+        if card != "none":
+            if len(card) > 2:
+                cardValue = card[0:2]
+            else:
+                cardValue = card[0]
+            cardsValue.append(cardValue)
+    # TODO check if cards submitted have same value
+    n = 0
+    badCard = False
+    while n < len(cardsValue):
+        more = n
+        while more < len(cardsValue):
+            if cardsValue[n] == cardsValue[more]:
+                more += 1
+            else:
+                badCard = True
+                break
+        if not badCard:
+            n += 1
+        else:
+            badCards()
+            return
+
+    if game.rounds == 0:
+        setCards(card1, card2, card3, card4)
+    else:
+        if len(cardsValue) == len(actualCardsSet):
+            try:
+                indexedValue = index[cardsValue[0]]
+            except KeyError:
+                indexedValue = cardsValue[0]
+
+            if len(game.setCards[0]) > 2:
+                setCardValue = game.setCards[0][0:2]
+            else:
+                setCardValue = game.setCards[0][0]
+
+            try:
+                indexedSetValue = index[setCardValue]
+            except KeyError:
+                indexedSetValue = setCardValue
+
+            if int(indexedValue) > int(indexedSetValue):
+                setCards(card1, card2, card3, card4)
+            else:
+                badCards()
+        else:
+            badCards()
+
+
+def setCards(card1, card2, card3, card4):
+    global game
+    cards = [card1, card2, card3, card4]
+    n = 0
+    while n < len(cards):
+        game.setCards[n] = cards[n]
+        n += 1
+
+    emit("update_middle", {"card1": card1, "card2": card2, "card3": card3, "card4": card4}, broadcast=True)
+    for player in playersGame:
+        if player.sid == request.sid:
+            if len(player.cards) == 0:
+                emit("winner", player.name, broadcast=True)
+                break
+            else:
+                game.rounds += 1
+                nextPlayer()
+
+
+def badCards():
+    emit("badCards", room=request.sid)
+
+
+currentPlayer = -1
+
+
+def nextPlayer():
+    global currentPlayer
+    global playersGame
+    currentPlayer += 1
+    print(currentPlayer)
+    if currentPlayer < len(playersGame):
+        emit("yourTurn", room=playersGame[currentPlayer].sid)
+    else:
+        currentPlayer = 0
+        emit("yourTurn", room=playersGame[currentPlayer].sid)
 
 
 if __name__ == '__main__':
