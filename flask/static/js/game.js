@@ -32,6 +32,7 @@ socket.on('connect', function () {
   });
 
 socket.on("ownCards", function (cards) {
+    document.cookie = "state=ingame";
     let cardX = 100;
     let topV = 90;
 
@@ -72,6 +73,15 @@ function chooseCard() {
             this.style.visibility = "hidden";
             second = true
         }
+        if (first && second) {
+            let subBtn = document.createElement("button");
+            subBtn.onclick = submitCards;
+            subBtn.id = "subBtn";
+            subBtn.className = "subButton";
+            subBtn.innerHTML = "Submit cards";
+            document.body.appendChild(subBtn);
+        }
+
     } else {
         alert("Not your turn!")
     }
@@ -85,6 +95,27 @@ function detachCard(){
     } else {
         document.getElementById(rightCard).style.visibility = 'visible';
         second = false;
+    }
+    document.getElementById("subBtn").remove()
+}
+
+function submitCards(){
+    let valueL;
+    let valueR;
+    if (leftCard.length <= 2){
+        valueL = leftCard.substring(0,1);
+    } else {
+        valueL = leftCard.substring(0,2);
+    }
+
+    if (rightCard.length <= 2){
+        valueR = rightCard.substring(0,1);
+    } else {
+        valueR = rightCard.substring(0,2);
+    }
+
+    if (valueL === valueR){
+  alert("the cards needs to be the same")
     }
 }
 

@@ -10,10 +10,6 @@
 </head>
 <body>
 
- {% for player in players %}
-    <p id="player{{ loop.index }}">Player</p>
- {% endfor %}
-
 <script>
     var centerX = window.innerWidth/2;
     var centerY = window.innerHeight/2;
@@ -36,7 +32,8 @@
     middleCardRight.id = "rightCardSelected";
     document.body.appendChild(middleCardRight);
 
-    createCircleOfDivs(8, radius, offsetX, offsetY, "dynamic");
+
+    createCircleOfDivs({{ playerAmount|safe}}, radius, offsetX, offsetY, "dynamic")
     function createCircleOfDivs(num, radius, offsetX, offsetY, className) {
     var x, y;
     for (var n = 0; n < num; n++) {
@@ -48,6 +45,18 @@
          div.style.top = (y + offsetY) + "px";
          div.id = "player" + n;
          document.body.appendChild(div);
+         let playerIMG = document.createElement("IMG");
+         playerIMG.className = "playerIMG";
+         playerIMG.src = "static/img/player/player.png";
+         document.getElementById("player" + n).appendChild(playerIMG);
+         let nameField = document.createElement("span");
+         nameField.className = "player";
+         nameField.innerHTML = {{ players|safe }}[n].name;
+        document.getElementById("player" + n).appendChild(nameField);
+         let cardsField = document.createElement("span");
+         cardsField.className = "cardsAmount";
+         cardsField.innerHTML = "Cards left: " + Math.floor(52 / {{ playerAmount|safe}});
+         document.getElementById("player" + n).appendChild(cardsField);
        }
     }
 

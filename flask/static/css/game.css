@@ -1,7 +1,6 @@
 .dynamic {
   width: 200px;
   height: 100px;
-  background: red;
   position: absolute;
 }
 
@@ -9,4 +8,42 @@
   position: absolute;
   width: 100px;
   height: 170px;
+}
+
+.subButton {
+  position: absolute;
+  width: 100px;
+  height: 30px;
+  left: 100px;
+  top: 60%;
+}
+
+.cardsAmount {
+  align-self: center;
+  text-align: center;
+  position: absolute;
+  overflow-wrap: unset;
+  width: 100px;
+  height: 10px;
+  top: 85%;
+  left: 25%;
+}
+
+.player {
+  text-align: center;
+  align-self: center;
+  position: absolute;
+  overflow-wrap: unset;
+  width: 100px;
+  height: 10px;
+  left: 25%;
+  top: 0px;
+}
+
+.playerIMG {
+  position: absolute;
+  width: 40%;
+  height: 60%;
+  top: 20%;
+  left: 30%;
 }
