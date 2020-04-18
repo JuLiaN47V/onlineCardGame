@@ -44,8 +44,39 @@ let username;
     rightSelectionCard.onclick = detachCard;
     rightSelectionCard.src = "static/img/cards/none.png";
     document.body.appendChild(rightSelectionCard);
+
     function pass(){
-        socket.emit("pass")
+            element = document.getElementById(leftCard);
+    if(typeof(element) != 'undefined' && element != null){
+        first = false;
+        document.getElementById(leftCard).style.visibility = "visible";
+        document.getElementById("leftSelectionCard").src = "static/img/cards/none.png";
+    }
+    element = document.getElementById(leftMiddleCard);
+    if(typeof(element) != 'undefined' && element != null){
+        second = false;
+        document.getElementById(leftMiddleCard).style.visibility = "visible";
+        document.getElementById("leftMiddleSelectionCard").src = "static/img/cards/none.png";
+    }
+    element = document.getElementById(rightMiddleCard);
+    if(typeof(element) != 'undefined' && element != null){
+        third = false;
+        document.getElementById(rightMiddleCard).style.visibility = "visible";
+        document.getElementById("rightMiddleSelectionCard").src = "static/img/cards/none.png";
+    }
+    element = document.getElementById(rightCard);
+    if(typeof(element) != 'undefined' && element != null){
+        fourth = false;
+        document.getElementById(rightCard).style.visibility = "visible";
+        document.getElementById("rightSelectionCard").src = "static/img/cards/none.png";
+    }
+    document.body.removeChild(document.getElementById("subBtn"));
+    myTurn = true;
+    leftCard = "none";
+    leftMiddleCard = "none";
+    rightMiddleCard = "none";
+    rightCard = "none";
+    socket.emit("pass")
     }
     let passBtn = document.createElement("button");
     passBtn.onclick = pass;
