@@ -27,20 +27,7 @@ class Game:
     def __init__(self):
         self.players = playersGame  # list of players
         self.cardsLeft = [  # cards that needs to be given to the players at start
-            "2T", "2P", "2H", "2K",
-            "3T", "3P", "3H", "3K",
-            "4T", "4P", "4H", "4K",
-            "5T", "5P", "5H", "5K",
-            "6T", "6P", "6H", "6K",
-            "7T", "7P", "7H", "7K",
-            "8T", "8P", "8H", "8K",
-            "9T", "9P", "9H", "9K",
-            "10T", "10P", "10H", "10K",
-            "BT", "BP", "BH", "BK",
-            "DT", "DP", "DH", "DK",
-            "KT", "KP", "KH", "KK",
-            "AT", "AP", "AH", "AK"
-        ]
+            "2T", "2P"]
 
 
 class Player:
@@ -172,7 +159,7 @@ def startGame():  # The entire game
 def giveCardsEachPlayer():
     global playersGame
     global game
-    cardsEachPlayer = 52 / len(game.players)  # Cards Amount / Amount of Player
+    cardsEachPlayer = 2 / len(game.players)  # Cards Amount / Amount of Player
     x = 0
     for player in game.players:
         tempCards = []
@@ -288,13 +275,21 @@ def setCards(card1, card2, card3, card4):
                 player.cards.remove(card)
             if len(player.cards) == 0:
                 emit("winner", {"winner": player.name}, broadcast=True)
-                game = game()
+                reset()
                 break
             else:
                 emit("update_playerCards", {"index": index, "value": len(player.cards)}, broadcast=True)
                 game.rounds += 1
                 nextPlayer()
 
+
+def reset():
+    global playersGame
+    global playersReady
+    players.clear()
+    players.clear()  # playerlist for lobby
+    playersGame = []  # playerlist for game
+    playersReady = 0  # amount of players that are ready to play
 
 @socketio.on("pass")
 def passFunc():
