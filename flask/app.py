@@ -312,20 +312,26 @@ def badCards():
     emit("badCards", room=request.sid)
 
 
-currentPlayer = -1
+currentPlayer = 0
 
 
 def nextPlayer():
     global currentPlayer
     global playersGame
-    currentPlayer += 1
+
     if currentPlayer < len(playersGame):
-        emit("update_currentPlayer", {"cid": currentPlayer, "lid": currentPlayer-1}, broadcast=True)
+        if currentPlayer == 0:
+            lastPlayerID = len(playersGame) - 1
+        else:
+            lastPlayerID = currentPlayer - 1
+        emit("update_currentPlayer", {"cid": currentPlayer, "lid": lastPlayerID}, broadcast=True)
         emit("yourTurn", room=playersGame[currentPlayer].sid)
     else:
         currentPlayer = 0
-        emit("update_currentPlayer", {"cid": currentPlayer, "lid": len(playersGame)}, broadcast=True)
+        emit("update_currentPlayer", {"cid": currentPlayer, "lid": len(playersGame) - 1}, broadcast=True)
         emit("yourTurn", room=playersGame[currentPlayer].sid)
+
+    currentPlayer += 1
 
 
 if __name__ == '__main__':

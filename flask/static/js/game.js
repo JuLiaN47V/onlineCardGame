@@ -150,6 +150,7 @@ function detachCard(){
 
 function submitCards(){
     socket.emit("chooseCard", leftCard, leftMiddleCard, rightMiddleCard, rightCard);
+    document.body.removeChild(document.getElementById("subBtn"));
     myTurn = false;
     first = false;
     second = false;
@@ -180,7 +181,6 @@ socket.on("update_middle", function (cards) {
     document.getElementById("middleCardRight").src = "static/img/cards/" + cards.card4 + ".png";
     document.getElementById("rightSelectionCard").src = "static/img/cards/none.png";
     fourth = false;
-    document.body.removeChild(document.getElementById("subBtn"));
     leftCard = "none";
     leftMiddleCard = "none";
     rightMiddleCard = "none";
@@ -212,6 +212,7 @@ socket.on("badCards", function () {
         document.getElementById(rightCard).style.visibility = "visible";
         document.getElementById("rightSelectionCard").src = "static/img/cards/none.png";
     }
+    document.body.removeChild(document.getElementById("subBtn"));
     myTurn = true;
     leftCard = "none";
     leftMiddleCard = "none";
