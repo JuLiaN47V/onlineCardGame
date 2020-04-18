@@ -5,6 +5,7 @@ from flask_socketio import SocketIO, join_room, leave_room, emit
 import random
 import json
 
+# TODO sid'get switched
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'secret!'
 app.config['SESSION_COOKIE_HTTPONLY'] = False
@@ -20,6 +21,8 @@ class Game:
     setCards = ["none", "none", "none", "none"]  # cards on table
     cardsLeft = []  # cards that needs to be given to the players
     rounds = 0
+    lastPlayer = None
+    passAmount = 0
 
     def __init__(self):
         self.players = playersGame  # list of players
@@ -52,7 +55,7 @@ class Player:
         self.state = "lobby"
 
 
-game = None
+game = Game
 
 
 @socketio.on('redirect')  # event to handle redirect from index to lobby in index.js
@@ -91,17 +94,18 @@ def disconnect():
 def start():  # event is sent after host started the game in lobby.js
     global playersGame
     playersGame = players.copy()  # copies current playerlist cause players get remove on disconnect event (redirect in next step = new Socket connection)
-    emit("redirect", {'url': url_for('game')}, broadcast=True)  # redirects
+    emit("redirect", {'url': url_for('gameFunc')}, broadcast=True)  # redirects
 
 
 @app.route('/game')
-def game():
+def gameFunc():
     testlist = []
-    for player in playersGame:
+    global game
+    game = Game()
+    for player in game.players:
         player = player.__dict__
         testlist.append(player)
 
-    print(testlist)
     return render_template('game.html', players=json.dumps(testlist), playerAmount=len(
         testlist))  # render template with list of players that were in the lobby to start the game
 
@@ -168,9 +172,10 @@ def startGame():  # The entire game
 def giveCardsEachPlayer():
     global playersGame
     global game
-    cardsEachPlayer = 52 / len(playersGame)  # Cards Amount / Amount of Player
-    game = Game()
-    for player in playersGame:
+    cardsEachPlayer = 52 / len(game.players)  # Cards Amount / Amount of Player
+    x = 0
+    for player in game.players:
+        tempCards = []
         player.state = "ingame"
         player.cards.clear()  # Clear cards of each player (else bug that list append else other???)
         i = 0
@@ -179,11 +184,15 @@ def giveCardsEachPlayer():
                 card = game.cardsLeft[random.randrange(0, len(game.cardsLeft) - 1)]  # choose random card of left cards
             else:
                 card = game.cardsLeft[0]
-            player.cards.append(card)  # give player card
+            tempCards.append(card)  # append random card
             game.cardsLeft.remove(card)  # remove card from the cards that are left
             i += 1
+        game.players[x].cards = tempCards
+        x += 1
         emit("ownCards", player.cards, room=player.sid)
 
+    print(game.players[0].cards, game.players[0].name)
+    print(game.players[1].cards, game.players[1].name)
 
 def givePlayerCards(player):
     emit("ownCards", player.cards, room=player.sid)
@@ -206,13 +215,22 @@ def chooseCard(card1, card2, card3, card4):
             else:
                 cardValue = card[0]
             cardsValue.append(cardValue)
-    # TODO check if cards submitted have same value
+
     n = 0
     badCard = False
     while n < len(cardsValue):
-        more = n
+        more = 0
+        try:
+            nValue = index[cardsValue[n]]
+        except KeyError:
+            nValue = cardsValue[n]
         while more < len(cardsValue):
-            if cardsValue[n] == cardsValue[more]:
+            try:
+                moreValue = index[cardsValue[more]]
+            except KeyError:
+                moreValue = cardsValue[more]
+
+            if nValue == moreValue:
                 more += 1
             else:
                 badCard = True
@@ -236,7 +254,6 @@ def chooseCard(card1, card2, card3, card4):
                 setCardValue = game.setCards[0][0:2]
             else:
                 setCardValue = game.setCards[0][0]
-
             try:
                 indexedSetValue = index[setCardValue]
             except KeyError:
@@ -253,20 +270,44 @@ def chooseCard(card1, card2, card3, card4):
 def setCards(card1, card2, card3, card4):
     global game
     cards = [card1, card2, card3, card4]
+    actualCards = []
+    for card in cards:
+        if card != "none":
+            actualCards.append(card)
     n = 0
     while n < len(cards):
         game.setCards[n] = cards[n]
         n += 1
-
     emit("update_middle", {"card1": card1, "card2": card2, "card3": card3, "card4": card4}, broadcast=True)
-    for player in playersGame:
+    for player in game.players:
         if player.sid == request.sid:
+            game.lastPlayer = player
+            game.passAmount = 0
+            index = game.players.index(player)
+            for card in actualCards:
+                player.cards.remove(card)
             if len(player.cards) == 0:
                 emit("winner", player.name, broadcast=True)
                 break
             else:
+                emit("update_playerCards", {"index": index, "value": len(player.cards)}, broadcast=True)
                 game.rounds += 1
                 nextPlayer()
+
+
+@socketio.on("pass")
+def passFunc():
+    global game
+    if game.passAmount < len(game.players) - 1:
+        game.passAmount += 1
+        nextPlayer()
+    else:
+        game.rounds = 0
+        card1 = "none"
+        card2 = "none"
+        card3 = "none"
+        card4 = "none"
+        emit("update_middle", {"card1": card1, "card2": card2, "card3": card3, "card4": card4}, broadcast=True)
 
 
 def badCards():
@@ -280,7 +321,6 @@ def nextPlayer():
     global currentPlayer
     global playersGame
     currentPlayer += 1
-    print(currentPlayer)
     if currentPlayer < len(playersGame):
         emit("yourTurn", room=playersGame[currentPlayer].sid)
     else:

@@ -47,11 +47,11 @@
     middleCardRight.style.top = offsetY - 30 + "px";
     middleCardRight.src = "static/img/cards/none.png";
     middleCardRight.className = "image";
-    middleCardRight.id = " middleCardRight";
+    middleCardRight.id = "middleCardRight";
     document.body.appendChild(middleCardRight);
 
 
-    createCircleOfDivs(12, radius, offsetX, offsetY, "dynamic") //createCircleOfDivs({{ playerAmount|safe}}, radius, offsetX, offsetY, "dynamic")
+    createCircleOfDivs({{ playerAmount|safe}}, radius, offsetX, offsetY, "dynamic")
     function createCircleOfDivs(num, radius, offsetX, offsetY, className) {
     var x, y;
     for (var n = 0; n < num; n++) {

@@ -47,3 +47,9 @@
   top: 20%;
   left: 30%;
 }
+
+.passBtn{
+  position: absolute;
+  left: 540px;
+  top: 65%
+}

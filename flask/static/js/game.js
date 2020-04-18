@@ -44,7 +44,15 @@ let username;
     rightSelectionCard.onclick = detachCard;
     rightSelectionCard.src = "static/img/cards/none.png";
     document.body.appendChild(rightSelectionCard);
-
+    function pass(){
+        socket.emit("pass")
+    }
+    let passBtn = document.createElement("button");
+    passBtn.onclick = pass;
+    passBtn.id = "passBtn";
+    passBtn.className = "passBtn";
+    passBtn.innerHTML = "pass";
+    document.body.appendChild(passBtn);
 
 var socket = io.connect('http://' + document.domain + ':' + location.port);
 socket.on('connect', function () {
@@ -137,11 +145,15 @@ function detachCard(){
         document.getElementById(rightCard).style.visibility = 'visible';
         fourth = false;
     }
-    document.getElementById("subBtn").remove()
+    document.body.removeChild(document.getElementById("subBtn"));
 }
 
 function submitCards(){
     socket.emit("chooseCard", leftCard, leftMiddleCard, rightMiddleCard, rightCard);
+    first = false;
+    second = false;
+    third = false;
+    fourth = false;
 }
 
 
@@ -154,12 +166,24 @@ socket.on("yourTurn", function () {
     setTimeout(function () {alert("Your turn!");}, 500);
 });
 
-
 socket.on("update_middle", function (cards) {
     document.getElementById("middleCardLeft").src = "static/img/cards/" + cards.card1 + ".png";
+    document.getElementById("leftSelectionCard").src = "static/img/cards/none.png";
+    first = false
     document.getElementById("middleCardMiddleLeft").src = "static/img/cards/" + cards.card2 + ".png";
+    document.getElementById("leftMiddleSelectionCard").src = "static/img/cards/none.png";
+    second = false;
     document.getElementById("middleCardMiddleRight").src = "static/img/cards/" + cards.card3 + ".png";
+    document.getElementById("rightMiddleSelectionCard").src = "static/img/cards/none.png";
+    third = false;
     document.getElementById("middleCardRight").src = "static/img/cards/" + cards.card4 + ".png";
+    document.getElementById("rightSelectionCard").src = "static/img/cards/none.png";
+    fourth = false;
+    document.body.removeChild(document.getElementById("subBtn"));
+    leftCard = "none";
+    leftMiddleCard = "none";
+    rightMiddleCard = "none";
+    rightCard = "none";
 });
 
 socket.on("badCards", function () {
@@ -187,15 +211,17 @@ socket.on("badCards", function () {
         document.getElementById(rightCard).style.visibility = "visible";
         document.getElementById("rightSelectionCard").src = "static/img/cards/none.png";
     }
-
-
-
-
-
-
-
-
-
-
+    leftCard = "none";
+    leftMiddleCard = "none";
+    rightMiddleCard = "none";
+    rightCard = "none";
     alert("Not working")
+});
+
+socket.on("update_playerCards", function (values) {
+    document.getElementById("player" + values.index).lastElementChild.innerHTML = "cards left: " + values.value;
+});
+
+socket.on("winner", function () {
+    alert("WINNER")
 });
