@@ -80,10 +80,11 @@ let username;
         document.getElementById("rightSelectionCard").src = "static/img/cards/none.png";
     }
 
-    let subBtn = document.getElementById(rightCard);
-    if(typeof(subBtn) != 'undefined' && element != null) {
-        document.body.removeChild(document.getElementById("subBtn"));
+    element = document.getElementById("subBtn");
+    if(typeof(element) != 'undefined' && element != null) {
+        document.body.removeChild(element)
     }
+
     myTurn = false;
     document.cookie = "state=ingame";
     leftCard = "none";
@@ -180,15 +181,19 @@ function detachCard(){
     if (this.id === "leftSelectionCard") {
         document.getElementById(leftCard).style.visibility = 'visible';
         first = false;
+        leftCard = "none";
     } else if (this.id === "leftMiddleSelectionCard") {
         document.getElementById(leftMiddleCard).style.visibility = 'visible';
         second = false;
+        leftMiddleCard = "none";
     } else if (this.id === "rightMiddleSelectionCard") {
         document.getElementById(rightMiddleCard).style.visibility = 'visible';
         third = false;
+        rightMiddleCard = "none";
     } else if (this.id === "rightSelectionCard") {
         document.getElementById(rightCard).style.visibility = 'visible';
         fourth = false;
+        rightCard = "none";
     }
     document.body.removeChild(document.getElementById("subBtn"));
 }
@@ -260,6 +265,7 @@ socket.on("badCards", function () {
         document.getElementById(rightCard).style.visibility = "visible";
         document.getElementById("rightSelectionCard").src = "static/img/cards/none.png";
     }
+    myTurn = true
     leftCard = "none";
     leftMiddleCard = "none";
     rightMiddleCard = "none";
@@ -278,6 +284,6 @@ socket.on("update_currentPlayer", function (id) {
 
 socket.on("winner", function (player) {
     alert(player.winner + " has won!")
-    window.location = location.hostname.split('.').slice(1).join('.');
+    window.location = "/"
 });
 
