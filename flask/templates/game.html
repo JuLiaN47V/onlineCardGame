@@ -69,7 +69,7 @@
          document.getElementById("player" + n).appendChild(playerIMG);
          let nameField = document.createElement("span");
          nameField.className = "player";
-         nameField.innerHTML = "test"; //nameField.innerHTML = {{ players|safe }}[n].name;
+         nameField.innerHTML = {{ players|safe }}[n].name;
         document.getElementById("player" + n).appendChild(nameField);
          let cardsField = document.createElement("span");
          cardsField.className = "cardsAmount";

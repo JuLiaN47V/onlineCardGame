@@ -1,11 +1,20 @@
-var cookieArr = document.cookie.split(";");
 var myTurn = false;
+var cookieArr = document.cookie.split(";");
+let state;
 let username;
     // Loop through the array elements
     for(var i = 0; i < cookieArr.length; i++) {
         var cookiePair = cookieArr[i].split("=");
-        if (cookiePair[0] === "username"){
-            username = cookiePair[1]
+        switch (cookiePair[0]) {
+            case "username":
+                username = cookiePair[1];
+                break;
+            case " state":
+                state = cookiePair[1];
+                if (state === "myTurn"){
+                    myTurn = true;
+                }
+                break;
         }
     }
 
@@ -46,7 +55,7 @@ let username;
     document.body.appendChild(rightSelectionCard);
 
     function pass(){
-            element = document.getElementById(leftCard);
+        element = document.getElementById(leftCard);
     if(typeof(element) != 'undefined' && element != null){
         first = false;
         document.getElementById(leftCard).style.visibility = "visible";
@@ -70,8 +79,13 @@ let username;
         document.getElementById(rightCard).style.visibility = "visible";
         document.getElementById("rightSelectionCard").src = "static/img/cards/none.png";
     }
-    document.body.removeChild(document.getElementById("subBtn"));
-    myTurn = true;
+
+    let subBtn = document.getElementById(rightCard);
+    if(typeof(subBtn) != 'undefined' && element != null) {
+        document.body.removeChild(document.getElementById("subBtn"));
+    }
+    myTurn = false;
+    document.cookie = "state=ingame";
     leftCard = "none";
     leftMiddleCard = "none";
     rightMiddleCard = "none";
@@ -183,6 +197,7 @@ function submitCards(){
     socket.emit("chooseCard", leftCard, leftMiddleCard, rightMiddleCard, rightCard);
     document.body.removeChild(document.getElementById("subBtn"));
     myTurn = false;
+    document.cookie = "state=ingame";
     first = false;
     second = false;
     third = false;
@@ -192,6 +207,7 @@ function submitCards(){
 
 socket.on("yourTurn", function () {
     myTurn = true;
+    document.cookie = "state=myTurn";
     first = false;
     second = false;
     third = false;
@@ -260,7 +276,7 @@ socket.on("update_currentPlayer", function (id) {
     document.getElementById("player" + id.lid).children[0].src = "static/img/player/player.png"
 });
 
-socket.on("winner", function () {
-    alert("WINNER")
+socket.on("winner", function (player) {
+    alert(player.winner + " has won!")
 });
 

@@ -27,20 +27,7 @@ class Game:
     def __init__(self):
         self.players = playersGame  # list of players
         self.cardsLeft = [  # cards that needs to be given to the players at start
-            "2T", "2P", "2H", "2K",
-            "3T", "3P", "3H", "3K",
-            "4T", "4P", "4H", "4K",
-            "5T", "5P", "5H", "5K",
-            "6T", "6P", "6H", "6K",
-            "7T", "7P", "7H", "7K",
-            "8T", "8P", "8H", "8K",
-            "9T", "9P", "9H", "9K",
-            "10T", "10P", "10H", "10K",
-            "BT", "BP", "BH", "BK",
-            "DT", "DP", "DH", "DK",
-            "KT", "KP", "KH", "KK",
-            "AT", "AP", "AH", "AK"
-        ]
+            "2T", "2P", "2H", "2K"]
 
 
 class Player:
@@ -172,7 +159,7 @@ def startGame():  # The entire game
 def giveCardsEachPlayer():
     global playersGame
     global game
-    cardsEachPlayer = 52 / len(game.players)  # Cards Amount / Amount of Player
+    cardsEachPlayer = 4 / len(game.players)  # Cards Amount / Amount of Player
     x = 0
     for player in game.players:
         tempCards = []
@@ -237,7 +224,6 @@ def chooseCard(card1, card2, card3, card4):
         if not badCard:
             n += 1
         else:
-            print("testBad")
             badCards()
             return
 
@@ -245,7 +231,6 @@ def chooseCard(card1, card2, card3, card4):
         setCards(card1, card2, card3, card4)
         #check if cards are higher then given one
     else:
-        print("eye")
         if len(cardsValue) == len(actualCardsSet):
             try:
                 indexedValue = index[cardsValue[0]]
@@ -260,7 +245,6 @@ def chooseCard(card1, card2, card3, card4):
                 indexedSetValue = index[setCardValue]
             except KeyError:
                 indexedSetValue = setCardValue
-            print(indexedValue, indexedSetValue)
             if int(indexedValue) > int(indexedSetValue):
                 setCards(card1, card2, card3, card4)
             else:
@@ -289,7 +273,7 @@ def setCards(card1, card2, card3, card4):
             for card in actualCards:
                 player.cards.remove(card)
             if len(player.cards) == 0:
-                emit("winner", player.name, broadcast=True)
+                emit("winner", {"winner": player.name}, broadcast=True)
                 break
             else:
                 emit("update_playerCards", {"index": index, "value": len(player.cards)}, broadcast=True)
@@ -310,6 +294,7 @@ def passFunc():
         card3 = "none"
         card4 = "none"
         emit("update_middle", {"card1": card1, "card2": card2, "card3": card3, "card4": card4}, broadcast=True)
+        emit("yourTurn", room=request.sid)
 
 
 def badCards():
