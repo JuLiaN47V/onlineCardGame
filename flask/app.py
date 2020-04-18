@@ -188,6 +188,7 @@ def giveCardsEachPlayer():
             game.cardsLeft.remove(card)  # remove card from the cards that are left
             i += 1
         game.players[x].cards = tempCards
+        game.players[x].cards.sort()
         x += 1
         emit("ownCards", player.cards, room=player.sid)
 
