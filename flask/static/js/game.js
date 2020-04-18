@@ -278,5 +278,6 @@ socket.on("update_currentPlayer", function (id) {
 
 socket.on("winner", function (player) {
     alert(player.winner + " has won!")
+    window.location = location.hostname.split('.').slice(1).join('.');
 });
 

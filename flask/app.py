@@ -287,6 +287,7 @@ def setCards(card1, card2, card3, card4):
                 player.cards.remove(card)
             if len(player.cards) == 0:
                 emit("winner", {"winner": player.name}, broadcast=True)
+                game = game()
                 break
             else:
                 emit("update_playerCards", {"index": index, "value": len(player.cards)}, broadcast=True)
