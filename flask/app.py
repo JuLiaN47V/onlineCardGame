@@ -216,6 +216,7 @@ def chooseCard(card1, card2, card3, card4):
 
     n = 0
     badCard = False
+    # test if submitted cards have same value
     while n < len(cardsValue):
         more = 0
         try:
@@ -236,12 +237,15 @@ def chooseCard(card1, card2, card3, card4):
         if not badCard:
             n += 1
         else:
+            print("testBad")
             badCards()
             return
 
     if game.rounds == 0:
         setCards(card1, card2, card3, card4)
+        #check if cards are higher then given one
     else:
+        print("eye")
         if len(cardsValue) == len(actualCardsSet):
             try:
                 indexedValue = index[cardsValue[0]]
@@ -256,7 +260,7 @@ def chooseCard(card1, card2, card3, card4):
                 indexedSetValue = index[setCardValue]
             except KeyError:
                 indexedSetValue = setCardValue
-
+            print(indexedValue, indexedSetValue)
             if int(indexedValue) > int(indexedSetValue):
                 setCards(card1, card2, card3, card4)
             else:

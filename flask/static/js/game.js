@@ -219,6 +219,7 @@ socket.on("update_middle", function (cards) {
 });
 
 socket.on("badCards", function () {
+
     element = document.getElementById(leftCard);
     if(typeof(element) != 'undefined' && element != null){
         first = false;
@@ -243,8 +244,6 @@ socket.on("badCards", function () {
         document.getElementById(rightCard).style.visibility = "visible";
         document.getElementById("rightSelectionCard").src = "static/img/cards/none.png";
     }
-    document.body.removeChild(document.getElementById("subBtn"));
-    myTurn = true;
     leftCard = "none";
     leftMiddleCard = "none";
     rightMiddleCard = "none";
