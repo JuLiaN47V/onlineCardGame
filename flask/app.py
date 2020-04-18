@@ -191,8 +191,6 @@ def giveCardsEachPlayer():
         x += 1
         emit("ownCards", player.cards, room=player.sid)
 
-    print(game.players[0].cards, game.players[0].name)
-    print(game.players[1].cards, game.players[1].name)
 
 def givePlayerCards(player):
     emit("ownCards", player.cards, room=player.sid)
@@ -322,9 +320,11 @@ def nextPlayer():
     global playersGame
     currentPlayer += 1
     if currentPlayer < len(playersGame):
+        emit("update_currentPlayer", {"cid": currentPlayer, "lid": currentPlayer-1}, broadcast=True)
         emit("yourTurn", room=playersGame[currentPlayer].sid)
     else:
         currentPlayer = 0
+        emit("update_currentPlayer", {"cid": currentPlayer, "lid": len(playersGame)}, broadcast=True)
         emit("yourTurn", room=playersGame[currentPlayer].sid)
 
 

@@ -150,6 +150,7 @@ function detachCard(){
 
 function submitCards(){
     socket.emit("chooseCard", leftCard, leftMiddleCard, rightMiddleCard, rightCard);
+    myTurn = false;
     first = false;
     second = false;
     third = false;
@@ -211,6 +212,7 @@ socket.on("badCards", function () {
         document.getElementById(rightCard).style.visibility = "visible";
         document.getElementById("rightSelectionCard").src = "static/img/cards/none.png";
     }
+    myTurn = true;
     leftCard = "none";
     leftMiddleCard = "none";
     rightMiddleCard = "none";
@@ -222,6 +224,12 @@ socket.on("update_playerCards", function (values) {
     document.getElementById("player" + values.index).lastElementChild.innerHTML = "cards left: " + values.value;
 });
 
+socket.on("update_currentPlayer", function (id) {
+    document.getElementById("player" + id.cid).children[0].src = "static/img/player/playerActive.png"
+    document.getElementById("player" + id.lid).children[0].src = "static/img/player/player.png"
+});
+
 socket.on("winner", function () {
     alert("WINNER")
 });
+
