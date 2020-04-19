@@ -103,7 +103,6 @@ let username;
 var socket = io.connect('http://' + document.domain + ':' + location.port);
 socket.on('connect', function () {
     socket.emit('hello_game', username)
-    alert("connected")
   });
 
 socket.on("ownCards", function (cards) {

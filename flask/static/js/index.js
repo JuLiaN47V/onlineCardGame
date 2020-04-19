@@ -1,4 +1,4 @@
-if (document.getElementById("current_name").innerHTML === "Please set a name" || document.getElementById("current_name").innerHTML === "Name is already taken") {
+if (document.getElementById("current_name").innerHTML === "Please set a name" || document.getElementById("current_name").innerHTML === "Name is already taken" || document.getElementById("current_name").innerHTML === "No spaces in name!") {
 
 } else {
   var br = document.createElement("br");

@@ -145,6 +145,11 @@ def home():
             if player.name == username:  #
                 taken = True  #
                 break  #
+        for c in username:
+            if c == " ":
+                nameText = "No spaces in name!"
+                return render_template('index.html', nameText=nameText)
+
         if not taken:  # if name is not taken:
             session["username"] = username  # set Session cookie for username
             nameText = "Current name: " + username  # set display text
