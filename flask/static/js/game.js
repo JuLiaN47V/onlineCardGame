@@ -171,12 +171,19 @@ function chooseCard() {
             document.body.appendChild(subBtn);
         }
 
+        element = document.getElementById("passBtn");
+        if(typeof(element) != 'undefined' && element != null) {
+            document.body.removeChild(document.getElementById("passBtn"));
+        }
+
+
+
     } else {
         alert("Not your turn!")
     }
 }
 
-function detachCard(){
+function detachCard() {
     this.src = "static/img/cards/none.png";
     if (this.id === "leftSelectionCard") {
         document.getElementById(leftCard).style.visibility = 'visible';
@@ -195,7 +202,18 @@ function detachCard(){
         fourth = false;
         rightCard = "none";
     }
-    document.body.removeChild(document.getElementById("subBtn"));
+    if (!first && !second && !third && !fourth) {
+        let passBtn = document.createElement("button");
+        passBtn.onclick = pass;
+        passBtn.id = "passBtn";
+        passBtn.className = "passBtn";
+        passBtn.innerHTML = "pass";
+        document.body.appendChild(passBtn);
+        element = document.getElementById("subBtn");
+        while (typeof (element) != 'undefined' && element != null) {
+            document.body.removeChild(document.getElementById("subBtn"));
+        }
+    }
 }
 
 function submitCards(){
@@ -213,10 +231,7 @@ function submitCards(){
 socket.on("yourTurn", function () {
     myTurn = true;
     document.cookie = "state=myTurn";
-    first = false;
-    second = false;
-    third = false;
-    fourth = false;
+    detachCard()
     setTimeout(function () {alert("Your turn!");}, 500);
 });
 

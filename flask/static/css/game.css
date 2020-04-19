@@ -14,7 +14,7 @@
   position: absolute;
   width: 100px;
   height: 30px;
-  left: 100px;
+  left: 5.2%;
   top: 60%;
 }
 
@@ -50,6 +50,8 @@
 
 .passBtn{
   position: absolute;
-  left: 540px;
-  top: 65%
+  width: 100px;
+  height: 30px;
+  left: 5.2%;
+  top: 60%;
 }
