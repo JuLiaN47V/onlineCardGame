@@ -124,10 +124,9 @@ def hello_game(username):
             else:
                 player.state = "game_ready"  # set state to ready
                 playersReady += 1  # count up the amount of players that are ready
-    if not reload:
-        emit("test", {"test": playersReady})
-        if playersReady == len(playersGame):  # if all players are ready
-            startGame()
+        if not reload:
+            if playersReady == len(playersGame):  # if all players are ready
+                startGame()
 
 
 @app.route('/lobby')
