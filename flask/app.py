@@ -165,8 +165,8 @@ def home():
 
 
 def startGame():  # The entire game
-    emit("test", broadcast=True)
     giveCardsEachPlayer()  # give players the cards once
+    emit("test")
     nextPlayer()
 
 
