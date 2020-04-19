@@ -119,6 +119,9 @@ def hello_game(username):
         if player.name == username:  # find objekt of session were the event is emitted from
             player.sid = request.sid  # set sid to new sid
             if player.state == "ingame":
+                givePlayerCards(player)
+                reload = True
+            else:
                 player.state = "game_ready"  # set state to ready
                 playersReady += 1  # count up the amount of players that are ready
     if not reload:
