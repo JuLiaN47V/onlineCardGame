@@ -102,6 +102,7 @@ let username;
 
 var socket = io.connect('http://' + document.domain + ':' + location.port);
 socket.on('connect', function () {
+    alert("connected")
     socket.emit('hello_game', username)
   });
 
