@@ -302,3 +302,7 @@ socket.on("winner", function (player) {
     window.location = "/"
 });
 
+socket.on("test", function () {
+    alert("start");
+})
+
