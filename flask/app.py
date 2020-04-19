@@ -187,15 +187,21 @@ def giveCardsEachPlayer():
         while i < int(cardsEachPlayer):
             if len(game.cardsLeft) > 1:
                 card = game.cardsLeft[random.randrange(0, len(game.cardsLeft) - 1)]  # choose random card of left cards
-            else:
+                tempCards.append(card)  # append random card
+                game.cardsLeft.remove(card)  # remove card from the cards that are left
+            elif len(game.cardsLeft) == 1:
                 card = game.cardsLeft[0]
-            tempCards.append(card)  # append random card
-            game.cardsLeft.remove(card)  # remove card from the cards that are left
+                tempCards.append(card)  # append random card
+                game.cardsLeft.remove(card)  # remove card from the cards that are left
             i += 1
         game.players[x].cards = tempCards
         game.players[x].cards.sort()
         x += 1
         emit("ownCards", player.cards, room=player.sid)
+
+    print(game.players[0].cards, game.players[0].name)
+    print(game.players[1].cards, game.players[1].name)
+    print(game.players[2].cards, game.players[2].name)
 
 
 def givePlayerCards(player):
