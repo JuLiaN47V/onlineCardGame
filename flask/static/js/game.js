@@ -163,14 +163,21 @@ function chooseCard() {
             fourth = true
         }
         if (first || second || third || fourth) {
-            let subBtn = document.createElement("button");
-            subBtn.onclick = submitCards;
-            subBtn.id = "subBtn";
-            subBtn.className = "subButton";
-            subBtn.innerHTML = "Submit cards";
-            document.body.appendChild(subBtn);
+            element = document.getElementById("passBtn");
+            if(typeof(element) != 'undefined' && element != null) {
+                document.body.removeChild(document.getElementById("passBtn"));
+            }
+            element = document.getElementById("subBtn");
+            if(typeof(element) != 'undefined' && element != null) {
+            } else {
+                let subBtn = document.createElement("button");
+                subBtn.onclick = submitCards;
+                subBtn.id = "subBtn";
+                subBtn.className = "subButton";
+                subBtn.innerHTML = "Submit cards";
+                document.body.appendChild(subBtn);
+            }
         }
-
         element = document.getElementById("passBtn");
         if(typeof(element) != 'undefined' && element != null) {
             document.body.removeChild(document.getElementById("passBtn"));
@@ -210,7 +217,7 @@ function detachCard() {
         passBtn.innerHTML = "pass";
         document.body.appendChild(passBtn);
         element = document.getElementById("subBtn");
-        while (typeof (element) != 'undefined' && element != null) {
+        if (typeof (element) != 'undefined' && element != null) {
             document.body.removeChild(document.getElementById("subBtn"));
         }
     }
@@ -218,7 +225,6 @@ function detachCard() {
 
 function submitCards(){
     socket.emit("chooseCard", leftCard, leftMiddleCard, rightMiddleCard, rightCard);
-    document.body.removeChild(document.getElementById("subBtn"));
     myTurn = false;
     document.cookie = "state=ingame";
     first = false;
@@ -285,7 +291,24 @@ socket.on("badCards", function () {
     leftMiddleCard = "none";
     rightMiddleCard = "none";
     rightCard = "none";
+    element = document.getElementById("subBtn");
+    if(typeof(element) != 'undefined' && element != null) {
+        document.body.removeChild(document.getElementById("subBtn"));
+    }
+
+    element = document.getElementById("passBtn");
+    if(typeof(element) != 'undefined' && element != null) {
+
+    } else {
+        let passBtn = document.createElement("button");
+        passBtn.onclick = pass;
+        passBtn.id = "passBtn";
+        passBtn.className = "passBtn";
+        passBtn.innerHTML = "pass";
+        document.body.appendChild(passBtn);
+    }
     alert("Not working")
+
 });
 
 socket.on("update_playerCards", function (values) {
