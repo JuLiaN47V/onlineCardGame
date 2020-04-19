@@ -125,6 +125,7 @@ def hello_game(username):
                 player.state = "game_ready"  # set state to ready
                 playersReady += 1  # count up the amount of players that are ready
     if not reload:
+        emit("test", {"test": playersReady})
         if playersReady == len(playersGame):  # if all players are ready
             startGame()
 
@@ -166,7 +167,6 @@ def home():
 
 def startGame():  # The entire game
     giveCardsEachPlayer()  # give players the cards once
-    emit("test", {"test": playersReady}, broadcast=True)
     nextPlayer()
 
 
