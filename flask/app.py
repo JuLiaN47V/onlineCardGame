@@ -1,9 +1,11 @@
 import threading
+from _thread import start_new_thread
 from flask import Flask, session, make_response
 from flask import render_template, redirect, url_for, request
 from flask_socketio import SocketIO, join_room, leave_room, emit
 import random
 import json
+import time
 
 # TODO sid'get switched
 app = Flask(__name__)
@@ -23,6 +25,7 @@ class Game:
     rounds = 0
     lastPlayer = None
     passAmount = 0
+    state = None
 
     def __init__(self):
         self.players = playersGame  # list of players
@@ -48,6 +51,7 @@ class Player:
     name = None  # username
     state = None  # state
     cards = []  # cards on hand
+    reload = False
 
     def __init__(self, name, sid):
         self.sid = sid
@@ -75,8 +79,10 @@ def new_player():
 @socketio.on('disconnect')  # event that handles every disconnection of every client
 def disconnect():
     global players
+    inLobby = False
     for player in players:
         if player.sid == request.sid:  # finds player with sid of event
+            inLobby = True
             if players[0].sid == player.sid:  #
                 players.remove(player)  # removes player
                 try:
@@ -87,7 +93,20 @@ def disconnect():
                 players.remove(player)
             del player  # destruct objekt
             break
-    emit('update_player_amount', {'amountP': len(players)}, broadcast=True)
+        else:
+            emit('update_player_amount', {'amountP': len(players)}, broadcast=True)
+
+    if not inLobby:
+        start_new_thread(checkDiscFunc, (request.sid,))
+
+
+def checkDiscFunc(sid):
+    time.sleep(0.5)
+    for player in game.players:
+        if player.sid == sid:
+            game.players.remove(player)
+            del player
+            break
 
 
 @socketio.on('start')
@@ -112,14 +131,14 @@ def gameFunc():
 
 @socketio.on('hello_game')  # event is sent after connection in game.js
 def hello_game(username):
-    global playersGame
     global playersReady
     reload = False
-    for player in playersGame:  # for each player
+    for player in game.players:  # for each player
         if player.name == username:  # find objekt of session were the event is emitted from
             player.sid = request.sid  # set sid to new sid
             if player.state == "ingame":
                 givePlayerCards(player)
+                player.reload = True
                 reload = True
             else:
                 player.state = "game_ready"  # set state to ready
@@ -133,7 +152,7 @@ def hello_game(username):
 def lobby():
     global players
     return render_template('lobby.html',
-                           playerAmount=len(players))  # render tamplate for the lobby with live playeramount
+                           playerAmount=len(players))  # render template for the lobby with live playeramount
 
 
 @app.route('/', methods=["POST", "GET"])
@@ -170,6 +189,10 @@ def home():
 
 
 def startGame():  # The entire game
+    game.state = "ongoing"
+    for player in players:
+        del player
+    players.clear()
     giveCardsEachPlayer()  # give players the cards once
     nextPlayer()
 
@@ -250,7 +273,7 @@ def chooseCard(card1, card2, card3, card4):
 
     if game.rounds == 0:
         setCards(card1, card2, card3, card4)
-        #check if cards are higher then given one
+        # check if cards are higher then given one
     else:
         if len(cardsValue) == len(actualCardsSet):
             try:
@@ -304,12 +327,15 @@ def setCards(card1, card2, card3, card4):
 
 
 def reset():
+    global game
     global playersGame
     global playersReady
-    players.clear()
     players.clear()  # playerlist for lobby
     playersGame = []  # playerlist for game
     playersReady = 0  # amount of players that are ready to play
+    del game
+    game = Game()
+
 
 @socketio.on("pass")
 def passFunc():
