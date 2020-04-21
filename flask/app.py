@@ -124,9 +124,9 @@ def hello_game(username):
             else:
                 player.state = "game_ready"  # set state to ready
                 playersReady += 1  # count up the amount of players that are ready
-        if not reload:
-            if playersReady == len(playersGame):  # if all players are ready
-                startGame()
+    if not reload:
+        if playersReady == len(playersGame):  # if all players are ready
+            startGame()
 
 
 @app.route('/lobby')
@@ -198,10 +198,6 @@ def giveCardsEachPlayer():
         game.players[x].cards.sort()
         x += 1
         emit("ownCards", player.cards, room=player.sid)
-
-    print(game.players[0].cards, game.players[0].name)
-    print(game.players[1].cards, game.players[1].name)
-    print(game.players[2].cards, game.players[2].name)
 
 
 def givePlayerCards(player):
