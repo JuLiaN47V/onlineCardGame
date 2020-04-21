@@ -12,6 +12,14 @@
     <form  method = "post" />
 	<input id="nameField" type="text" name="name">
 	<input type="submit" value="set name"/>
+
+    {% for lobby in lobbyList %}
+        <div onclick="joinLobby()" id="lobby{{lobby.lobbyID}}">
+            <p>{{lobby.name}}</p>
+        </div>
+    {% endfor %}
+
+
 </form>
 </body>
 </html>

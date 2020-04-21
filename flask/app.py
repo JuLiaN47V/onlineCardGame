@@ -55,6 +55,15 @@ class Player:
         self.state = "lobby"
 
 
+class Lobby:
+    lobbyPlayers = []
+    lobbyID = int
+    name = str
+    game = Game()
+
+    def __init__(self, name):
+        self.name = name
+
 game = Game
 
 
@@ -70,6 +79,19 @@ def new_player():
     if len(players) == 1:  # if this is only player
         emit('host', room=players[0].sid)  # event to set to lobbyhost
     emit('update_player_amount', {'amountP': len(players)}, broadcast=True)  # event to update playeramount
+
+
+@socketio.on("joinLobby")
+def joinLobby(lobbyid):
+    testid = int
+    for lobbyi in lobbyList:
+        print(lobbyi.lobbyID, lobbyid)
+        if lobbyi.lobbyID == lobbyid:
+            testid = lobbyid
+            lobbyi.lobbyPlayers.append(Player(session["username"], request.sid))  # construct new player object
+            if len(players) == 1:  # if this is only player
+                emit('host', room=players[0].sid)  # event to set to lobbyhost
+    emit("setLobby", {"lobby": testid})
 
 
 @socketio.on('disconnect')  # event that handles every disconnection of every client
@@ -131,9 +153,17 @@ def hello_game(username):
 
 @app.route('/lobby')
 def lobby():
-    global players
-    return render_template('lobby.html',
-                           playerAmount=len(players))  # render tamplate for the lobby with live playeramount
+    #TODO
+    print(request.cookies)
+    return render_template('lobby.html', lobby=lobbyList[0])  # render tamplate for the lobby with live playeramount
+
+
+@socketio.on("createLobby")
+def createLobby():
+    test = Lobby("test")
+    test.lobbyID = len(lobbyList)
+    lobbyList.append(test)
+    emit("addLobby", {"lobbyName": test.name, "lobbyID": test.lobbyID}, broadcast=True)
 
 
 @app.route('/', methods=["POST", "GET"])
@@ -154,7 +184,7 @@ def home():
             session["username"] = username  # set Session cookie for username
             nameText = "Current name: " + username  # set display text
             socketio.emit('joinLobbyBTN')  # Event to create button to join gamelobby
-            resp = make_response(render_template('index.html', nameText=nameText))  # create response with template
+            resp = make_response(render_template('index.html', nameText=nameText, lobbyList=lobbyList))  # create response with template
             resp.set_cookie('username', username)  # set cookie in response
             return resp
         else:  # if name is taken:
@@ -163,7 +193,7 @@ def home():
     elif "username" in session:  # if the site is entered and cookie with username is set
         nameText = "Current name: " + session["username"]  # set display text do username
         socketio.emit('joinLobbyBTN')  # event to create button to join gamelobby
-        return render_template('index.html', nameText=nameText)
+        return render_template('index.html', nameText=nameText, lobbyList=lobbyList)
     else:
         nameText = "Please set a name"  # if site is entered without cookie
         return render_template('index.html', nameText=nameText)
@@ -358,4 +388,5 @@ def nextPlayer():
 
 
 if __name__ == '__main__':
+    lobbyList = []
     socketio.run(app, host='0.0.0.0', debug=True)
