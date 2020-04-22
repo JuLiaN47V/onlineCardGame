@@ -70,32 +70,38 @@ def redirect():
 @socketio.on('new_player')  # event that handles new player in lobby.js
 def new_player():
     global players
-    players.append(Player(session["username"], request.sid))  # construct new player object
-    if len(players) == 1:  # if this is only player
-        emit('host', room=players[0].sid)  # event to set to lobbyhost
-    emit('update_player_amount', {'amountP': len(players)}, broadcast=True)  # event to update playeramount
+    exists = False
+    for player in players:
+        if player.name == session["username"]:
+            exists = True
+            break
+    if not exists:
+        players.append(Player(session["username"], request.sid))  # construct new player object
+        if len(players) == 1:  # if this is only player
+            emit('host', room=players[0].sid)  # event to set to lobbyhost
+        emit('update_player_amount', {'amountP': len(players)}, broadcast=True)  # event to update playeramount
 
 
 @socketio.on('disconnect')  # event that handles every disconnection of every client
 def disconnect():
     global players
-    inLobby = False
+    inLobby = True
     for player in players:
         if player.sid == request.sid:  # finds player with sid of event
-            inLobby = True
+            inLobby = False
             if players[0].sid == player.sid:  #
                 players.remove(player)  # removes player
-                try:
-                    emit('host', room=players[0].sid)  # tries to set host to first player
-                except IndexError:
-                    pass
-            else:
+            try:
                 players.remove(player)
+            except ValueError:
+                pass
+            emit('update_player_amount', {'amountP': len(players)}, broadcast=True)
             del player  # destruct objekt
             break
-        else:
-            emit('update_player_amount', {'amountP': len(players)}, broadcast=True)
-
+    try:
+        emit('host', room=players[0].sid)
+    except IndexError:
+        pass
     if not inLobby:
         start_new_thread(checkDiscFunc, (request.sid,))
 
