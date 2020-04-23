@@ -150,7 +150,7 @@ def hello_game(username):
                 player.state = "game_ready"  # set state to ready
                 playersReady += 1  # count up the amount of players that are ready
     if not reload:
-        if playersReady == len(playersGame):  # if all players are ready
+        if playersReady == len(game.players):  # if all players are ready
             startGame()
 
 
@@ -348,15 +348,15 @@ def passFunc():
     global game
     if game.passAmount < len(game.players) - 1:
         game.passAmount += 1
-        nextPlayer()
-    else:
-        game.rounds = 0
-        card1 = "none"
-        card2 = "none"
-        card3 = "none"
-        card4 = "none"
-        emit("update_middle", {"card1": card1, "card2": card2, "card3": card3, "card4": card4}, broadcast=True)
-        emit("yourTurn", room=request.sid)
+        if game.passAmount == len(game.players) - 1:
+            game.passAmount = 0
+            game.rounds = 0
+            card1 = "none"
+            card2 = "none"
+            card3 = "none"
+            card4 = "none"
+            emit("update_middle", {"card1": card1, "card2": card2, "card3": card3, "card4": card4}, broadcast=True)
+    nextPlayer()
 
 
 def badCards():
@@ -370,17 +370,17 @@ def nextPlayer():
     global currentPlayer
     global playersGame
 
-    if currentPlayer < len(playersGame):
+    if currentPlayer < len(game.players):
         if currentPlayer == 0:
-            lastPlayerID = len(playersGame) - 1
+            lastPlayerID = len(game.players) - 1
         else:
             lastPlayerID = currentPlayer - 1
         emit("update_currentPlayer", {"cid": currentPlayer, "lid": lastPlayerID}, broadcast=True)
-        emit("yourTurn", room=playersGame[currentPlayer].sid)
+        emit("yourTurn", room=game.players[currentPlayer].sid)
     else:
         currentPlayer = 0
-        emit("update_currentPlayer", {"cid": currentPlayer, "lid": len(playersGame) - 1}, broadcast=True)
-        emit("yourTurn", room=playersGame[currentPlayer].sid)
+        emit("update_currentPlayer", {"cid": currentPlayer, "lid": len(game.players) - 1}, broadcast=True)
+        emit("yourTurn", room=game.players[currentPlayer].sid)
 
     currentPlayer += 1
 

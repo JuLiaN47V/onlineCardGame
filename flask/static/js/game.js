@@ -55,7 +55,7 @@ let username;
     document.body.appendChild(rightSelectionCard);
 
     function pass(){
-        element = document.getElementById(leftCard);
+    element = document.getElementById(leftCard);
     if(typeof(element) != 'undefined' && element != null){
         first = false;
         document.getElementById(leftCard).style.visibility = "visible";
@@ -84,7 +84,7 @@ let username;
     if(typeof(element) != 'undefined' && element != null) {
         document.body.removeChild(element)
     }
-
+    delSubBtns();
     myTurn = false;
     document.cookie = "state=ingame";
     leftCard = "none";
@@ -93,12 +93,6 @@ let username;
     rightCard = "none";
     socket.emit("pass")
     }
-    let passBtn = document.createElement("button");
-    passBtn.onclick = pass;
-    passBtn.id = "passBtn";
-    passBtn.className = "passBtn";
-    passBtn.innerHTML = "pass";
-    document.body.appendChild(passBtn);
 
 var socket = io.connect('http://' + document.domain + ':' + location.port);
 socket.on('connect', function () {
@@ -223,6 +217,17 @@ function detachCard() {
     }
 }
 
+function delSubBtns(){
+    element = document.getElementById("passBtn");
+    if (typeof (element) != 'undefined' && element != null) {
+    document.body.removeChild(element)
+    }
+    element = document.getElementById("subBtn");
+    if (typeof (element) != 'undefined' && element != null) {
+    document.body.removeChild(element)
+    }
+}
+
 function submitCards(){
     socket.emit("chooseCard", leftCard, leftMiddleCard, rightMiddleCard, rightCard);
     myTurn = false;
@@ -231,14 +236,25 @@ function submitCards(){
     second = false;
     third = false;
     fourth = false;
+    delSubBtns();
 }
 
 
 socket.on("yourTurn", function () {
     myTurn = true;
     document.cookie = "state=myTurn";
-    detachCard()
+    detachCard();
     setTimeout(function () {alert("Your turn!");}, 500);
+    element = document.getElementById("passBtn");
+    if (typeof (element) != 'undefined' && element != null) {
+    } else {
+        let passBtn = document.createElement("button");
+        passBtn.onclick = pass;
+        passBtn.id = "passBtn";
+        passBtn.className = "passBtn";
+        passBtn.innerHTML = "pass";
+        document.body.appendChild(passBtn);
+    }
 });
 
 socket.on("update_middle", function (cards) {
