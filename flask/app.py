@@ -336,6 +336,8 @@ def reset():
     global game
     global playersGame
     global playersReady
+    global currentPlayer
+    currentPlayer = 0
     players.clear()  # playerlist for lobby
     playersGame = []  # playerlist for game
     playersReady = 0  # amount of players that are ready to play
